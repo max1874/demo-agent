@@ -1,0 +1,14 @@
+# Dependencies and generated output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Local credentials
+.env
+.env.*
+!.env.example
+
+# Local system and diagnostic files
+.DS_Store
+*.log
