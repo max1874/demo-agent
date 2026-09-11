@@ -1,79 +1,113 @@
-<p align="center">
-  <img src="assets/brand/original-banner.png" alt="demo-agent — ideas into action" width="100%">
-</p>
+<div align="center">
+  <img src="assets/brand/original-icon-dark.png" width="160" alt="demo-agent icon">
+  <h1>demo-agent</h1>
+  <p><strong>Ideas into action.</strong></p>
+  <p>
+    <img alt="TypeScript 7" src="https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white">
+    <img alt="Node 24+" src="https://img.shields.io/badge/Node-24%2B-5FA04E?logo=nodedotjs&logoColor=white">
+    <img alt="OpenAI-compatible" src="https://img.shields.io/badge/API-OpenAI--compatible-111827?logo=openai&logoColor=white">
+    <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-22c55e">
+    <img alt="No framework" src="https://img.shields.io/badge/framework-none-06b6d4">
+  </p>
+  <p><a href="#what-does-the-model-layer-look-like"><strong>Read the model layer</strong></a> · <a href="assets/README.md">Brand assets</a></p>
+</div>
 
-<p align="center">
-  A small TypeScript agent project, starting with an explicit model interface.
-</p>
+demo-agent is an agent written from scratch in TypeScript: no framework, no
+abstraction you did not read, no file long enough to lose your place in. It is
+where ideas about how an agent should actually be built get tried out, which
+only works if the whole thing stays small enough to hold in your head.
 
-<p align="center">
-  <a href="#the-model-layer">Model layer</a> ·
-  <a href="#configuration">Configuration</a> ·
-  <a href="assets/README.md">Brand assets</a>
-</p>
+Every layer is a plain file at the root of the repository. The model call is
+`llm.ts`. The types everyone shares are `types.ts`. When the loop arrives it
+will be `agent.ts`, and it will be one file you can read top to bottom.
 
-## Status
+## What state is this in?
 
-Early development. The model API adapter is implemented in [`llm.ts`](llm.ts). The agent loop and executable entry point are not present yet.
+Early. The model layer is implemented and the agent loop is not.
 
-`package.json` currently points `npm start` at a missing `index.ts` and does not declare dependencies. This checkout is therefore not ready for `npm install && npm start`.
-
-## The model layer
-
-The project exposes a small set of application types around the OpenAI Chat Completions API:
-
-| Interface | Purpose |
-| --- | --- |
-| `Message` | System, user, assistant, and tool-result history |
-| `ToolSchema` | Function descriptions and JSON Schema parameters |
-| `LLM.complete()` | Submit messages and optional tools to a model |
-| `CompletionResult` | Text, tool calls, finish reason, and token usage |
-
-`createLLM()` accepts explicit configuration. `llmFromEnv()` reads it from the environment. SDK message conversion stays inside `llm.ts`, so callers can use the project's own types.
-
-Tool-call arguments are returned as raw JSON strings. Parsing arguments, executing tools, and continuing the conversation belong to the future agent loop. Endpoint compatibility depends on support for the request fields used by the adapter.
-
-## Configuration
-
-[`.env.example`](.env.example) lists the settings consumed by `llmFromEnv()`:
-
-| Variable | Required | Purpose |
+| Piece | File | State |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | Yes | Credential for the selected endpoint |
-| `OPENAI_MODEL` | Yes | Explicit model identifier |
-| `OPENAI_BASE_URL` | No | Override the SDK's default API endpoint |
+| Shared types | [`types.ts`](types.ts) | Implemented |
+| Model calls | [`llm.ts`](llm.ts) | Implemented, not yet exercised against a live endpoint |
+| Agent loop | `agent.ts` | Not started |
+| Tools | `tools/` | Not started |
+| Entry point | `index.ts` | Not started — `pnpm start` points at a file that does not exist yet |
 
-The current code reads `process.env`; it does not load `.env` files automatically. Set these variables in the process environment or configure environment-file loading in the eventual entry point.
+Nothing here has been run against a real model yet, and the types have not been
+compiled. Treat the code as read-only until `index.ts` lands.
 
-The intended calling pattern, once dependencies and an entry point are added:
+## Why not just use a framework?
+
+Because the loop is the point. A framework earns its keep by letting you skip
+the question of how the agent works; this project exists to answer that
+question, so importing someone else's answer would leave nothing behind.
+
+The practical version of the same argument: an agent is a `while` loop around
+one HTTP call. The interesting decisions are which messages you keep, how tools
+describe themselves, and what you do when the model returns something you did
+not expect. None of those get easier by being wrapped.
+
+## What does the model layer look like?
+
+One file talks to the model API, and it exposes one function.
 
 ```ts
-import { llmFromEnv } from "./llm.ts"
+import { createLLM } from "./llm.js"
 
-const llm = llmFromEnv()
-const result = await llm.complete({
-  messages: [{ role: "user", content: "Turn this idea into a concrete plan." }],
+const llm = createLLM({
+  apiKey: process.env.OPENAI_API_KEY!,
+  model: "gpt-5.5",
 })
 
-console.log(result.content)
+const result = await llm.complete({
+  messages: [{ role: "user", content: "What is in this directory?" }],
+  tools: [readDirectory],
+})
+
+for (const call of result.tool_calls) {
+  // call.function.name, call.function.arguments
+}
 ```
 
-This example makes one completion request; it does not run tools or implement an agent loop.
+The types split along a line that decides how wide each side should be:
 
-## Project layout
+| Direction | Type | Source | Why |
+| --- | --- | --- | --- |
+| Request | `CompletionRequest` | The SDK's own type, minus `model` and `stream` | We are the writer. Extra fields are optional and cost nothing, and every knob the API grows — `tool_choice`, `reasoning_effort`, `verbosity`, `response_format` — arrives without anyone remembering to add it |
+| Response | `CompletionResult` | Written by hand, narrowed | We are the reader. A wide type means handling variants this project never produces |
 
-```text
-assets/
-  README.md             Asset guide
-  brand/                Logos, icons, original artwork, and visual comparison
-llm.ts                  Model API adapter and application interfaces
-.env.example            Configuration reference
-package.json            Project metadata and intended start command
-tsconfig.json           TypeScript configuration
+Three details in `llm.ts` exist because the API punishes the obvious version:
+
+- **Sampling knobs are omitted, never defaulted.** Reasoning models reject an
+  explicit `temperature` other than 1 with a 400, so a hardcoded default would
+  lock the project out of the models it most wants to run on.
+- **`arguments` stays a raw JSON string.** Models emit invalid JSON; what to do
+  about that belongs to the tool layer, not to the transport.
+- **An assistant message carrying `tool_calls` goes back into history verbatim,
+  and every call it made needs its own `tool` reply.** Breaking either rule is
+  a 400 on the next turn.
+
+Because the dialect is OpenAI Chat Completions, any endpoint that implements it
+— OpenRouter, DeepSeek, vLLM, Ollama — works by pointing `baseURL` at it.
+
+## What do I need to run it?
+
+- Node 24 or later
+- pnpm (the repository pins it through `packageManager`)
+- An API key for any service speaking the OpenAI Chat Completions format
+
+```bash
+pnpm install
 ```
 
-## Visual identity
+Configuration is read from the environment. Nothing is written to disk.
 
-The identity combines a sphere with three layered cards, using charcoal, ivory, and warm light. The original dark icon is the geometry reference for the SVG family.
+| Variable | Purpose |
+| --- | --- |
+| `OPENAI_API_KEY` | Credential for whichever endpoint you point at |
+| `OPENAI_MODEL` | Model id, for example `gpt-5.5` |
+| `OPENAI_BASE_URL` | Optional. Any OpenAI-compatible endpoint |
 
-See the [asset guide](assets/README.md) for recommended files and the [brand notes](assets/brand/README.md) for tracing and typography limitations. Open [`assets/brand/preview.html`](assets/brand/preview.html) locally for the comparison sheet; GitHub displays HTML source rather than running it.
+## License
+
+[MIT](LICENSE).
