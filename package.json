@@ -4,7 +4,21 @@
   "description": "ideas into action",
   "type": "module",
   "license": "MIT",
+  "packageManager": "pnpm@10.33.2",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
   "scripts": {
     "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "openai": "^7.15.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.4",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
   }
 }
