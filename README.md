@@ -6,7 +6,7 @@
     <img alt="TypeScript 7" src="https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white">
     <img alt="Node 24+" src="https://img.shields.io/badge/Node-24%2B-5FA04E?logo=nodedotjs&logoColor=white">
     <img alt="OpenAI-compatible" src="https://img.shields.io/badge/API-OpenAI--compatible-111827?logo=openai&logoColor=white">
-    <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-22c55e">
+    <img alt="PolyForm Noncommercial License" src="https://img.shields.io/badge/license-Noncommercial-f59e0b">
     <img alt="No framework" src="https://img.shields.io/badge/framework-none-06b6d4">
   </p>
   <p><a href="#what-does-the-model-layer-look-like"><strong>Read the model layer</strong></a> · <a href="assets/README.md">Brand assets</a></p>
@@ -110,4 +110,6 @@ Configuration is read from the environment. Nothing is written to disk.
 
 ## License
 
-[MIT](LICENSE).
+[PolyForm Noncommercial License 1.0.0](LICENSE). Any noncommercial purpose is
+permitted, including personal projects, research, education, and use by
+noncommercial organizations. Commercial use is not covered — ask first.
