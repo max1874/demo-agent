@@ -110,6 +110,9 @@ Configuration is read from the environment. Nothing is written to disk.
 
 ## License
 
-[PolyForm Noncommercial License 1.0.0](LICENSE). Any noncommercial purpose is
-permitted, including personal projects, research, education, and use by
-noncommercial organizations. Commercial use is not covered — ask first.
+[PolyForm Noncommercial 1.0.0](LICENSE) © 2026 Max.
+
+Free to use, change, and share for any noncommercial purpose — personal work,
+research, teaching, charity. Commercial use needs a separate licence; open an
+issue. This is source-available rather than open source: an open-source licence
+cannot restrict the field of use, and this one does.
