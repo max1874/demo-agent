@@ -6,7 +6,7 @@
     <img alt="TypeScript 7" src="https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white">
     <img alt="Node 24+" src="https://img.shields.io/badge/Node-24%2B-5FA04E?logo=nodedotjs&logoColor=white">
     <img alt="OpenAI-compatible" src="https://img.shields.io/badge/API-OpenAI--compatible-111827?logo=openai&logoColor=white">
-    <img alt="PolyForm Noncommercial License" src="https://img.shields.io/badge/license-Noncommercial-f59e0b">
+    <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-22c55e">
     <img alt="No framework" src="https://img.shields.io/badge/framework-none-06b6d4">
   </p>
   <p><a href="#what-does-the-model-layer-look-like"><strong>Read the model layer</strong></a> · <a href="assets/README.md">Brand assets</a></p>
@@ -110,9 +110,4 @@ Configuration is read from the environment. Nothing is written to disk.
 
 ## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE) © 2026 Max.
-
-Free to use, change, and share for any noncommercial purpose — personal work,
-research, teaching, charity. Commercial use needs a separate licence; open an
-issue. This is source-available rather than open source: an open-source licence
-cannot restrict the field of use, and this one does.
+[MIT](LICENSE) © 2026 MAX LIN
