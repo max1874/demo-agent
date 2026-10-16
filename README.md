@@ -12,7 +12,7 @@
   <p><a href="#what-does-the-model-layer-look-like"><strong>Read the model layer</strong></a> · <a href="assets/README.md">Brand assets</a></p>
 </div>
 
-demo-agent is an agent written from scratch in TypeScript: no framework, no
+demo-agent is an open-source AI agent written from scratch in TypeScript: no framework, no
 abstraction you did not read, no file long enough to lose your place in. It is
 where ideas about how an agent should actually be built get tried out, which
 only works if the whole thing stays small enough to hold in your head.
@@ -107,6 +107,30 @@ Configuration is read from the environment. Nothing is written to disk.
 | `OPENAI_API_KEY` | Credential for whichever endpoint you point at |
 | `OPENAI_MODEL` | Model id, for example `gpt-5.5` |
 | `OPENAI_BASE_URL` | Optional. Any OpenAI-compatible endpoint |
+
+## FAQ
+
+**How do I build an AI agent in TypeScript without LangChain?**
+The way this repository does it: `llm.ts` calls Chat Completions through the
+official `openai` SDK, the only runtime dependency, and returns content, tool
+calls and token usage. The loop goes in `agent.ts` as one `while` loop around
+that call. The model layer is written; the loop is not started.
+
+**Can I run it yet?**
+Not yet. `pnpm start` points at `index.ts`, which does not exist, and nothing
+has been run against a real model. For now, `llm.ts` and `types.ts` are the
+part worth reading.
+
+**Can I use DeepSeek, OpenRouter, or a local Ollama model?**
+The model layer speaks OpenAI Chat Completions and `createLLM` takes a
+`baseURL`, so any endpoint that implements it can be used. None has been
+checked against a live endpoint yet.
+
+**Why does a reasoning model reject my `temperature`?**
+Reasoning models answer an explicit `temperature` other than 1 with a 400,
+which is why `llm.ts` never defaults a sampling knob.
+
+More: [max1874.com/demo-agent](https://max1874.com/demo-agent/)
 
 ## License
 
