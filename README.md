@@ -100,7 +100,9 @@ Because the dialect is OpenAI Chat Completions, any endpoint that implements it
 pnpm install
 ```
 
-Configuration is read from the environment. Nothing is written to disk.
+`createLLM` takes its configuration as arguments and reads nothing by itself;
+the entry point (`index.ts`, not written yet) will read these variables from
+the environment and pass them in. Nothing is written to disk.
 
 | Variable | Purpose |
 | --- | --- |
